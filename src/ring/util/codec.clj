@@ -137,12 +137,13 @@
   ([encoded]
    (form-decode encoded "UTF-8"))
   ([^String encoded encoding]
-   (if-not (.contains encoded "=")
-     (form-decode-str encoded encoding)
-     (reduce
-      (fn [m param]
-        (if-let [[k v] (str/split param #"=" 2)]
-          (assoc-conj m (form-decode-str k encoding) (form-decode-str (or v "") encoding))
-          m))
-      {}
-      (str/split encoded #"&")))))
+   (let [encoding (or encoding "UTF-8")]
+     (if-not (.contains encoded "=")
+       (form-decode-str encoded encoding)
+       (reduce
+        (fn [m param]
+          (if-let [[k v] (str/split param #"=" 2)]
+            (assoc-conj m (form-decode-str k encoding) (form-decode-str (or v "") encoding))
+            m))
+        {}
+        (str/split encoded #"&"))))))
